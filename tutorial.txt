@@ -1,0 +1,19 @@
+npm install -D typescript
+npm install @types/node -D
+npx tsc --init --rootDir src --outDir build \
+npm install ts-node -D
+npm install ts-node nodemon -D
+
+
+"scripts": {
+	"dev": "ts-node src/app.ts"
+}
+
+
+npm install --save @typegoose/typegoose
+
+npm install @types/bcryptjs @types/config @types/express @types/jsonwebtoken @types/node -D
+
+CREATE ACCESS SECRET TOKEN
+> node
+> require("crypto").randomBytes(64).toString("hex")
