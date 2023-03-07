@@ -17,3 +17,19 @@ npm install @types/bcryptjs @types/config @types/express @types/jsonwebtoken @ty
 CREATE ACCESS SECRET TOKEN
 > node
 > require("crypto").randomBytes(64).toString("hex")
+
+
+
+
+
+
+
+DOCKER MONGODB SHELL
+
+mongosh
+use admin
+db.auth("username", "password")
+db.auth("root", "123456")
+show collections
+
+db.notes.find()
