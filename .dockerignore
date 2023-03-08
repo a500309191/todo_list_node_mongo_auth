@@ -1,5 +1,12 @@
-/node_modules
-/build
+/backend/node_modules
+/frontend/node_modules
+/backend/build
+/frontend/build
+
+/backend/.env
+/frontend/.env
+.env
+
 tutorial.txt
 README.md
 .gitignore

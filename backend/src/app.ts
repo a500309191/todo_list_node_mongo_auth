@@ -1,31 +1,28 @@
 // require('dotenv').config();
 import express, { Application, Request, Response, NextFunction }  from "express"
 import bodyParser from "body-parser"
-import { connectDB } from "./db/mongo"
+import cors from "cors"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcryptjs"
-import {
-    userModel,
-    User,
-    noteModel,
-    Note,
-    Token,
-    tokenModel
-} from "./db/schemas"
-import e from "express"
-import { NODATA } from "dns"
-import { createDeflate } from "zlib"
+import { connectDB } from "./db/mongo"
+import { userModel, User, noteModel, Note, Token, tokenModel } from "./db/schemas"
 
 
 const {
     PORT = "8080",
     JWT_ACCESS = "123456",
-    JWT_REFRESH = "654321"
+    JWT_REFRESH = "654321",
 } = process.env
 
 const app: Application = express()
 // middlewares:
 app.use(bodyParser.json())
+app.use(
+    cors({
+      origin: "http://localhost:3000",
+      credentials: true,
+    })
+  );
 
 
 
@@ -81,7 +78,7 @@ app.post(
 
 // user login
 app.post(
-    "/user/login",
+    "/user/signin",
     async (req: Request, res: Response): Promise<Response> => {
         const name = req.body.name
         const password = req.body.password
@@ -97,18 +94,59 @@ app.post(
             if (!bcrypt.compareSync(req.body.password, user.password)) {
                 return res.json({ success: false, error: "Wrong password" })
             } else {
-                const token: Token = await tokenModel.create({
-                    accessToken: jwt.sign({ name: user.name }, JWT_ACCESS),
-                    user: user._id
-                })
-                return res.status(201).json({
-                    accessToken: token.accessToken,
-                    userId: token.user
-                })
+                const token: Token | null = await tokenModel.findOne({ user })
+                if (!token) {
+                    const newToken: Token = await tokenModel.create({
+                        accessToken: jwt.sign({ name: user.name }, JWT_ACCESS),
+                        user: user._id
+                    })
+                    return res.status(201).json({
+                        accessToken: newToken.accessToken,
+                        userId: newToken.user
+                    })
+                } else {
+                    return res.status(201).json({
+                        accessToken: token.accessToken,
+                        userId: token.user
+                    })
+                }
+
             }
         }
     }
 )
+
+
+// user logout
+// app.post(
+//     "/user/signin",
+//     async (req: Request, res: Response): Promise<Response> => {
+//         const name = req.body.name
+//         const password = req.body.password
+
+//         if (!name || !password) {
+//             return res.status(400).json({ success: false, error: "Send needed params" })
+//         }
+
+//         const user = await userModel.findOne({ name })
+//         if (!user) {
+//             return res.json({ success: false, error: "User does not exist" })
+//         } else {
+//             if (!bcrypt.compareSync(req.body.password, user.password)) {
+//                 return res.json({ success: false, error: "Wrong password" })
+//             } else {
+//                 const token: Token = await tokenModel.create({
+//                     accessToken: jwt.sign({ name: user.name }, JWT_ACCESS),
+//                     user: user._id
+//                 })
+//                 return res.status(201).json({
+//                     accessToken: token.accessToken,
+//                     userId: token.user
+//                 })
+//             }
+//         }
+//     }
+// )
 
 
 // create note
@@ -145,6 +183,7 @@ app.get(
         const userId = await tokenModel.findOne({ accessToken: req.headers.authorization })
         if (userId) {
             const notes = await noteModel.find({ user: userId })
+                .catch(error => res.status(500).json({ error }))
             return res.status(201).json({ notes })
         } else {
             return res.status(401).json({ success: false, error: "No access rights" })
@@ -153,7 +192,7 @@ app.get(
 )
 
 
-// update notes
+// update note
 app.put(
     "/notes/:id",
     authenticateToken,
@@ -165,7 +204,7 @@ app.put(
             const _id = req.params.id
             if (body && isDone) {
                 await noteModel.updateOne({ _id }, { body, isDone, user })
-                    .catch(error => res.status(400).json({ error }))
+                    .catch(error => res.status(500).json({ error }))
                 return res.status(201).json({ succes: true, body, isDone })
             } else {
                 return res.status(400).json({ success: false, error: "Send needed params" })
@@ -176,8 +215,26 @@ app.put(
     }
 )
 
-
-app.delete
+// delete note
+// app.delete(
+//     "/notes/:id",
+//     authenticateToken,
+//     async (req: Request, res: Response): Promise<Response> => {
+//         const user = await tokenModel.findOne({ accessToken: req.headers.authorization })
+//         if (user) {
+//             const _id = req.params.id
+//             if (body && isDone) {
+//                 await noteModel.updateOne({ _id }, { body, isDone, user })
+//                     .catch(error => res.status(500).json({ error }))
+//                 return res.status(201).json({ succes: true, body, isDone })
+//             } else {
+//                 return res.status(400).json({ success: false, error: "Send needed params" })
+//             }
+//         } else {
+//             return res.status(401).json({ success: false, error: "No access rights" })
+//         }
+//     }
+// )
 
 
 app.listen(PORT, () => {
