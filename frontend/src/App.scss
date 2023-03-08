@@ -67,7 +67,7 @@ div * {
 
 .window {
   display: grid;
-  grid-template-columns: 20% auto 20%;
+  grid-template-columns: 20% 1fr 20%;
   grid-template-rows: 25px 1fr 20%;
   grid-template-areas:
     '. . .'
@@ -81,6 +81,134 @@ div * {
   justify-self: center;
   max-width: 800px;
 }
+
+
+
+
+
+.settings {
+  display: flex;
+  justify-content: space-between;;
+}
+
+.settings-logout {
+  cursor: pointer;
+}
+
+
+
+.account {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 600px;
+}
+
+.notes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.note {
+  display: grid;
+  grid-template-columns: 1fr 30px 30px;
+  gap: 10px;
+  // padding: 6px;
+}
+
+.note > div {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+.note-body {
+  padding-left: 10px;
+  background-color: $gray;
+  word-break: break-word;
+}
+
+.note-body-edit {
+  width: 100%;
+  padding-left: 7px;
+  box-sizing: border-box;
+  // border: 3px solid #ccc;
+  border: 3px solid $gray;
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+  outline: none;
+  font-size: 16px;
+}
+
+.note-body-edit:focus {
+  border: 3px solid $dark_gray;
+}
+
+.note-edit,
+.note-delete,
+.note-save,
+.note-cancel {
+  justify-content: center;
+  background-color: $dark_gray;
+  color: rgba(255,255,255,0.8);
+  font-weight: bold;
+  cursor: pointer;
+}
+.note-save {
+  background-color: $green;
+}
+.note-cancel {
+  background-color: $red;
+}
+
+
+
+
+
+
+
+.add-note {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.add-note-body {
+  resize: none;
+  height: 40px;
+  width: 100%;
+  padding: 12px 20px;
+  box-sizing: border-box;
+  border: 1px solid $dark_gray;
+  outline: none;
+}
+
+.add-note-body:focus {
+  background-color: $gray;
+}
+
+.add-note-button {
+  @include button($h: 30px);
+  color: white;
+  font-weight: bold;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -114,12 +242,10 @@ div * {
   opacity: 0.8;
   cursor: pointer;
 }
-
 .sign-tumbler > a:hover {
   transition-duration: 0.1s;
   opacity: 1;
 }
-
 .sign-button {
   @include button($h: 30px);
 }

@@ -1,8 +1,8 @@
 import { Routes, Route, Link, NavLink, useLocation, redirect } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks"
 import { setName, setPassword } from "../store/accountSlice"
-import { SignIn } from "../store/accountSlice"
-import { SignUp } from "../store/accountSlice"
+import { signIn } from "../store/accountSlice"
+import { signUp } from "../store/accountSlice"
 
 
 export const SignForm = () => {
@@ -16,23 +16,23 @@ export const SignForm = () => {
         <div className="sign-form">
             <div
                 className="sign-tumbler"
-                style={{ backgroundPosition: `${location == "/registration" ? "left" : "right"}` }}
+                style={{ backgroundPosition: `${location == "/signup" ? "left" : "right"}` }}
             >
                 <Link to="/" className="log-button">LOGIN</Link>
-                <Link to="/registration" className="reg-button">REGISTRATION</Link>
+                <Link to="/signup" className="reg-button">REGISTRATION</Link>
             </div>
             <input defaultValue={name} className="sign-name" onChange={e => dispatch(setName(e.target.value))} />
             <input type="password" defaultValue={password} className="sign-password" onChange={e => dispatch(setPassword(e.target.value))} />
             <div
                 className="sign-button"
                 onClick={() => {
-                    location == "/registration"
-                        ? dispatch(SignUp({name, password}))
-                        : dispatch(SignIn({name, password}))
+                    location == "/signup"
+                        ? dispatch(signUp({name, password}))
+                        : dispatch(signIn({name, password}))
                     }
                 }
             >
-                {location == "/registration" ? "REGISTRATION" : "LOGIN"}
+                {location == "/signup" ? "REGISTRATION" : "LOGIN"}
             </div>
         </div>
     )

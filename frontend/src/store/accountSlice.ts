@@ -1,36 +1,28 @@
 import { createSlice, PayloadAction, createAsyncThunk, AnyAction } from "@reduxjs/toolkit"
-import type {  Login, Note, Notes, AccountState, CreateNote, UpdateNote, User, CreateUser } from "../schemas/schemas"
+import type { 
+    Login,
+    LoginRes,
+    Note,
+    Notes,
+    AccountState,
+    CreateNote,
+    User,
+    CreateUser
+} from "../schemas/schemas"
 
 
 
-export const SignIn = createAsyncThunk<string, Login, {rejectValue: string}>(
-    "note/SignIn",
+export const signIn = createAsyncThunk<LoginRes, Login, {rejectValue: string}>(
+    "note/signIn",
 	async (body, thunkAPI) => {
-        const response = await fetch("http://localhost:8080/user/signin", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(body)
-        })
-
-        if (!response.ok) {
-            return thunkAPI.rejectWithValue("something went wrong")
-        }
-
-        const data = await response.json()
-        console.log("DATA: ", data)
-        return data.accessToken
-	}
-)
-
-
-export const SignUp = createAsyncThunk<CreateUser, Login, {rejectValue: string}>(
-    "user/SignUp",
-	async (body, thunkAPI) => {
-        const response = await fetch("http://localhost:8080/user/signup", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(body)
-        })
+        const response = await fetch(
+            "http://localhost:8080/user/signin",
+            {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(body)
+            }
+        )
 
         if (!response.ok) {
             return thunkAPI.rejectWithValue("something went wrong")
@@ -42,24 +34,74 @@ export const SignUp = createAsyncThunk<CreateUser, Login, {rejectValue: string}>
 )
 
 
-export const getNotes = createAsyncThunk<Notes, void, {rejectValue: string}>(
-	"user/getNotes",
+export const signOut = createAsyncThunk<void, void, {rejectValue: string}>(
+    "note/signOut",
 	async (_, thunkAPI) => {
-        console.log("getNotes")
         const token = localStorage.getItem("token")
-        
         if (token) {
-            const response = await fetch("http://localhost:8080/notes", {
-                method: "GET",
-                headers: {"Authorization": `${JSON.parse(token)}`}
-            });
+            const response = await fetch(
+                "http://localhost:8080/user/signout",
+                { 
+                    method: "DELETE",
+                    headers: { "Authorization": `${JSON.parse(token)}` }
+                }
+            )
             
             if (!response.ok) {
                 return thunkAPI.rejectWithValue("something went wrong")
             }
 
+            localStorage.removeItem("token")
             const data = await response.json()
-            console.log("DATA: ", data)
+            return data
+
+        } else {
+            return thunkAPI.rejectWithValue("something went wrong")
+        }
+	}
+)
+
+
+export const signUp = createAsyncThunk<CreateUser, Login, {rejectValue: string}>(
+    "user/signUp",
+	async (body, thunkAPI) => {
+        const response = await fetch(
+            "http://localhost:8080/user/signup", 
+            {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(body)
+            }
+        )
+
+        if (!response.ok) {
+            return thunkAPI.rejectWithValue("something went wrong")
+        }
+
+        const data = await response.json()
+        return data
+	}
+)
+
+
+export const getNotes = createAsyncThunk<Notes, string, {rejectValue: string}>(
+	"user/getNotes",
+	async (token, thunkAPI) => {
+        
+        if (token) {
+            const response = await fetch(
+                "http://localhost:8080/notes", 
+                {
+                    method: "GET",
+                    headers: {"Authorization": `${JSON.parse(token)}`}
+                }
+            )
+            
+            if (!response.ok) {
+                return thunkAPI.rejectWithValue("something went wrong")
+            }
+            
+            const data = await response.json()
             return data
 
         } else {
@@ -67,6 +109,7 @@ export const getNotes = createAsyncThunk<Notes, void, {rejectValue: string}>(
         }
     }
 )
+
 
 
 
@@ -78,7 +121,6 @@ const initialState: AccountState = {
     error: null,
     notes: [],
 }
-
 
 const accountSlice = createSlice({
     name: "account",
@@ -100,17 +142,20 @@ const accountSlice = createSlice({
     },
     extraReducers: builder => {
         builder
-            .addCase(SignIn.fulfilled, (state, action) => {
-                console.log("PAYLOAD: ", action.payload)
-                localStorage.setItem("token", JSON.stringify(action.payload))
+            .addCase(signIn.fulfilled, (state, action) => {
+                localStorage.setItem("token", JSON.stringify(action.payload.accessToken))
+                state.name = action.payload.name
                 state.isAuthenticated = true
             })
-            .addCase(SignUp.fulfilled, (state, action) => {
+            .addCase(signOut.fulfilled, (state, action) => {
+                state.isAuthenticated = false
+            })
+            .addCase(signUp.fulfilled, (state, action) => {
                 state.name = action.payload.name
             })
             .addCase(getNotes.fulfilled, (state, action) => {
                 state.notes = action.payload.notes
-                console.log(state.notes)
+                state.isAuthenticated = true
             })
     }
 })

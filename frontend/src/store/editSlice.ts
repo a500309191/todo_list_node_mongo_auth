@@ -2,10 +2,7 @@ import { createSlice } from "@reduxjs/toolkit"
 import type { EditState } from "../schemas/schemas"
 
 
-const initialState: EditState = {
-    selectedNote: null,
-    editableNote: null,
-}
+const initialState: EditState = { editableNote: 0 }
 
 const editSlice = createSlice({
     name: "edit",
@@ -13,18 +10,11 @@ const editSlice = createSlice({
     reducers: {
         editNote(state, action) {
             state.editableNote = action.payload
-        },
-        selectNote(state, action) {
-            if (state.selectedNote === action.payload) {
-                state.selectedNote = null
-            } else {
-                state.selectedNote = action.payload
-            }
         }
     },
 })
 
 
-export const { editNote, selectNote } = editSlice.actions
+export const { editNote } = editSlice.actions
 export default editSlice.reducer
 

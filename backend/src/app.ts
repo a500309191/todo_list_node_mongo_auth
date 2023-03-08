@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken"
 import bcrypt from "bcryptjs"
 import { connectDB } from "./db/mongo"
 import { userModel, User, noteModel, Note, Token, tokenModel } from "./db/schemas"
+import { errors } from "@typegoose/typegoose"
 
 
 const {
@@ -100,17 +101,17 @@ app.post(
                         accessToken: jwt.sign({ name: user.name }, JWT_ACCESS),
                         user: user._id
                     })
+                    console.log(newToken)
                     return res.status(201).json({
                         accessToken: newToken.accessToken,
-                        userId: newToken.user
+                        name: user.name
                     })
                 } else {
                     return res.status(201).json({
                         accessToken: token.accessToken,
-                        userId: token.user
+                        name: user.name
                     })
                 }
-
             }
         }
     }
@@ -118,35 +119,16 @@ app.post(
 
 
 // user logout
-// app.post(
-//     "/user/signin",
-//     async (req: Request, res: Response): Promise<Response> => {
-//         const name = req.body.name
-//         const password = req.body.password
+app.delete(
+    "/user/signout",
+    async (req: Request, res: Response): Promise<Response> => {
 
-//         if (!name || !password) {
-//             return res.status(400).json({ success: false, error: "Send needed params" })
-//         }
+        await tokenModel.deleteOne({ accessToken: req.headers.authorization })
+            .catch(error => res.status(500).json({ error }))
 
-//         const user = await userModel.findOne({ name })
-//         if (!user) {
-//             return res.json({ success: false, error: "User does not exist" })
-//         } else {
-//             if (!bcrypt.compareSync(req.body.password, user.password)) {
-//                 return res.json({ success: false, error: "Wrong password" })
-//             } else {
-//                 const token: Token = await tokenModel.create({
-//                     accessToken: jwt.sign({ name: user.name }, JWT_ACCESS),
-//                     user: user._id
-//                 })
-//                 return res.status(201).json({
-//                     accessToken: token.accessToken,
-//                     userId: token.user
-//                 })
-//             }
-//         }
-//     }
-// )
+        return res.status(201).json({ success: true })
+    }
+)
 
 
 // create note
@@ -200,12 +182,11 @@ app.put(
         const user = await tokenModel.findOne({ accessToken: req.headers.authorization })
         if (user) {
             const body = req.body.body
-            const isDone = req.body.isDone
             const _id = req.params.id
-            if (body && isDone) {
-                await noteModel.updateOne({ _id }, { body, isDone, user })
+            if (body) {
+                await noteModel.updateOne({ _id }, { body })
                     .catch(error => res.status(500).json({ error }))
-                return res.status(201).json({ succes: true, body, isDone })
+                return res.status(201).json({ succes: true, body })
             } else {
                 return res.status(400).json({ success: false, error: "Send needed params" })
             }
@@ -216,25 +197,17 @@ app.put(
 )
 
 // delete note
-// app.delete(
-//     "/notes/:id",
-//     authenticateToken,
-//     async (req: Request, res: Response): Promise<Response> => {
-//         const user = await tokenModel.findOne({ accessToken: req.headers.authorization })
-//         if (user) {
-//             const _id = req.params.id
-//             if (body && isDone) {
-//                 await noteModel.updateOne({ _id }, { body, isDone, user })
-//                     .catch(error => res.status(500).json({ error }))
-//                 return res.status(201).json({ succes: true, body, isDone })
-//             } else {
-//                 return res.status(400).json({ success: false, error: "Send needed params" })
-//             }
-//         } else {
-//             return res.status(401).json({ success: false, error: "No access rights" })
-//         }
-//     }
-// )
+app.delete(
+    "/notes/:id",
+    authenticateToken,
+    async (req: Request, res: Response): Promise<Response> => {
+
+        await noteModel.deleteOne({ _id:  req.params.id })
+            .catch(error => res.status(500).json({ error }))
+
+        return res.status(201).json({ success: true })
+    }
+)
 
 
 app.listen(PORT, () => {

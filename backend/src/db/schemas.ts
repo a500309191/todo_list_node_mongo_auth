@@ -16,18 +16,12 @@ export class User {
 
   @prop({ required: true, minLength: 8, maxLength: 100 })
   public password!: string;
-
-  // @prop({ ref: () => Note })
-  // public notes!: Ref<Note>[];
 }
 
 @modelOptions({ schemaOptions: { timestamps: true, versionKey: false} })
 export class Note {
-  @prop({ required: true, minLength: 10, maxLength: 255 })
+  @prop({ required: true, minLength: 10, maxLength: 60 })
   public body!: string
-
-  @prop({ default: false })
-  public isDone!: boolean
 
   @prop({ ref: () => User, required: true })
   public user!: Ref<User>

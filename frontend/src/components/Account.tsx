@@ -1,17 +1,14 @@
 import { useNavigate } from "react-router-dom";
+import { Settings } from "./Settings"
 import { NotesList } from "./NotesList"
+import { AddNote } from "./AddNote"
 import { useAppSelector, useAppDispatch } from "../hooks"
-import { getNotes } from "../store/accountSlice"
 import { useEffect } from "react"
 
 
 export const Account = () => {
     const dispatch = useAppDispatch()
     const userState = useAppSelector(state => state.account)
-
-    useEffect(() => {
-        dispatch(getNotes())
-      }, [dispatch])
 
     const navigate = useNavigate()
     useEffect(() => {
@@ -21,8 +18,10 @@ export const Account = () => {
     }, [userState.isAuthenticated])
 
     return (
-        <div className="user-account">
+        <div className="account">
+            <Settings />
             <NotesList />
+            <AddNote />
         </div>
     )
 }

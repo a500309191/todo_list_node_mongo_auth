@@ -3,13 +3,23 @@ export type Login = {
     password: string
 }
 
+export type LoginRes = {
+    accessToken: string
+    name: string
+}
+
 export type CreateNote = {
     body: string
 }
 
 export type UpdateNote = {
+    token: string
+    id: string
+}
+
+export type UpdateNoteRes = {
     body: string
-    isDone: boolean
+    success: boolean
 }
 
 export type Note = {
@@ -35,8 +45,7 @@ export type User = {
 }
 
 export type EditState = {
-    selectedNote: null | number
-    editableNote: null | number
+    editableNote: number
 }
 
 export type AccountState = {
