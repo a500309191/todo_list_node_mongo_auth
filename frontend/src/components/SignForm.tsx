@@ -9,8 +9,7 @@ export const SignForm = () => {
 
     const location = useLocation().pathname
     const dispatch = useAppDispatch()
-    const name = useAppSelector(state => state.account.name)
-    const password = useAppSelector(state => state.account.password)
+    const { name, password, error, signUpSuccess } = useAppSelector(state => state.account)
     
     return (
         <div className="sign-form">
@@ -18,22 +17,36 @@ export const SignForm = () => {
                 className="sign-tumbler"
                 style={{ backgroundPosition: `${location == "/signup" ? "left" : "right"}` }}
             >
-                <Link to="/" className="log-button">LOGIN</Link>
-                <Link to="/signup" className="reg-button">REGISTRATION</Link>
+                <Link to="/" className="log-button">SIGNIN</Link>
+                <Link to="/signup" className="reg-button">SIGNUP</Link>
             </div>
-            <input defaultValue={name} className="sign-name" onChange={e => dispatch(setName(e.target.value))} />
-            <input type="password" defaultValue={password} className="sign-password" onChange={e => dispatch(setPassword(e.target.value))} />
+            <input
+                className="sign-name"
+                placeholder="username"
+                defaultValue={name}
+                onChange={e => dispatch(setName(e.target.value))} 
+            />
+            <input
+                className="sign-password"
+                placeholder="password (at least 6 characters)"
+                type="password"
+                defaultValue={password}
+                onChange={e => dispatch(setPassword(e.target.value))}
+            />
             <div
-                className="sign-button"
+                className={`${name && password.length >= 6 ? "sign-button" : "sign-button unactive"}`}
                 onClick={() => {
-                    location == "/signup"
-                        ? dispatch(signUp({name, password}))
-                        : dispatch(signIn({name, password}))
+                    if (name && password) {
+                        location == "/signup"
+                            ? dispatch(signUp({name, password}))
+                            : dispatch(signIn({name, password}))
                     }
-                }
+                }}
             >
-                {location == "/signup" ? "REGISTRATION" : "LOGIN"}
+                ENTER
             </div>
+            {error && <div className="error">{error.toUpperCase()}</div>}
+            {signUpSuccess && <div className="success">USER {name} HAS BEEN REGISTERED</div>}
         </div>
     )
 }

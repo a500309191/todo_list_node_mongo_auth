@@ -9,7 +9,12 @@ export const NotesList = () => {
 
     return (
         <div className="notes">
-            {notes.map((note: NoteType) => <Note {...note} key={note._id}/>)}
+            {/* {notes.map((note: NoteType) => <Note {...note} key={note._id}/>)} */}
+            {notes.map((note: NoteType, index: number) => {
+                index += 1
+                const indexedNote: NoteType = {...note, index}
+                return <Note {...indexedNote} key={note._id}/>
+            })}
         </div>
     )
 }

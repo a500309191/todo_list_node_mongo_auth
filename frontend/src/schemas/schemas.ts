@@ -1,11 +1,17 @@
+export type Error = {
+    success: false
+    error: string
+}
+
 export type Login = {
     name: string
     password: string
 }
 
 export type LoginRes = {
-    accessToken: string
-    name: string
+    accessToken?: string
+    success: boolean
+    error: string
 }
 
 export type CreateNote = {
@@ -23,6 +29,7 @@ export type UpdateNoteRes = {
 }
 
 export type Note = {
+    index?: number
     _id: string
     body: string
     isDone: boolean
@@ -31,7 +38,8 @@ export type Note = {
     updatedAt: string
 }
 
-export type Notes = {
+export type Data = {
+    username: string
     notes: Note[]
 }
 
@@ -51,8 +59,9 @@ export type EditState = {
 export type AccountState = {
     name: string
     password: string
+    signUpSuccess: boolean
     isAuthenticated: boolean
     loading: boolean
-    error: null | boolean
+    error: null | string
     notes: Note[]
 }

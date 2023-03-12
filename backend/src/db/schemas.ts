@@ -14,23 +14,14 @@ export class User {
   @prop({ unique: true, required: true })
   public name!: string;
 
-  @prop({ required: true, minLength: 8, maxLength: 100 })
+  @prop({ required: true })
   public password!: string;
 }
 
 @modelOptions({ schemaOptions: { timestamps: true, versionKey: false} })
 export class Note {
-  @prop({ required: true, minLength: 10, maxLength: 60 })
+  @prop({ required: true, minlength: 5, maxlength: 60 })
   public body!: string
-
-  @prop({ ref: () => User, required: true })
-  public user!: Ref<User>
-}
-
-@modelOptions({ schemaOptions: { timestamps: true, versionKey: false} })
-export class Token {
-  @prop({ required: true })
-  public accessToken!: string
 
   @prop({ ref: () => User, required: true })
   public user!: Ref<User>
@@ -39,5 +30,4 @@ export class Token {
 
 export const userModel = getModelForClass(User);
 export const noteModel = getModelForClass(Note);
-export const tokenModel = getModelForClass(Token);
 

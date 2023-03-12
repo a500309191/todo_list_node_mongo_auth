@@ -5,7 +5,7 @@ import cors from "cors"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcryptjs"
 import { connectDB } from "./db/mongo"
-import { userModel, User, noteModel, Note, Token, tokenModel } from "./db/schemas"
+import { userModel, User, noteModel, Note } from "./db/schemas"
 import { errors } from "@typegoose/typegoose"
 
 
@@ -61,14 +61,13 @@ app.post(
         const name = req.body.name
         const password = req.body.password
         if (name && password) {
-            const newUser: User = await userModel.create({
-                name,
-                password: bcrypt.hashSync(req.body.password, 10)
-            })
-            if (newUser) {
+            try {
+                const hashedPassword = bcrypt.hashSync(req.body.password, 10)
+                const newUser: User = await userModel.create({ name, password: hashedPassword })
                 return res.status(201).json({ succes: true, name: newUser.name })
-            } else {
-                return res.status(500).json({ success: false, error: "Something went wrong"})
+            } catch (error) {
+                console.log(error)
+                return res.status(500).json({ success: false, error: "This username is already taken"})
             }
         } else {
             return res.status(400).json({ success: false, error: "Send needed params" })
@@ -90,62 +89,36 @@ app.post(
 
         const user = await userModel.findOne({ name })
         if (!user) {
-            return res.json({ success: false, error: "User does not exist" })
+            return res.status(500).json({ success: false, error: "User does not exist" })
         } else {
             if (!bcrypt.compareSync(req.body.password, user.password)) {
-                return res.json({ success: false, error: "Wrong password" })
+                return res.status(500).json({ success: false, error: "Wrong password" })
             } else {
-                const token: Token | null = await tokenModel.findOne({ user })
-                if (!token) {
-                    const newToken: Token = await tokenModel.create({
-                        accessToken: jwt.sign({ name: user.name }, JWT_ACCESS),
-                        user: user._id
-                    })
-                    console.log(newToken)
-                    return res.status(201).json({
-                        accessToken: newToken.accessToken,
-                        name: user.name
-                    })
-                } else {
-                    return res.status(201).json({
-                        accessToken: token.accessToken,
-                        name: user.name
-                    })
-                }
+                const accessToken = jwt.sign({ name: user.name }, JWT_ACCESS)
+                return res.status(201).json({ success: true, accessToken })
             }
         }
     }
 )
 
 
-// user logout
-app.delete(
-    "/user/signout",
-    async (req: Request, res: Response): Promise<Response> => {
-
-        await tokenModel.deleteOne({ accessToken: req.headers.authorization })
-            .catch(error => res.status(500).json({ error }))
-
-        return res.status(201).json({ success: true })
-    }
-)
 
 
 // create note
 app.post(
     "/notes",
     authenticateToken,
-    async (req: Request, res: Response): Promise<Response> => {
-        const user = await tokenModel.findOne({ accessToken: req.headers.authorization })
+    async (req: ExtendedRequest, res: Response): Promise<Response> => {
+        
+        const user = await userModel.findOne({ name: req.user.name })
         if (user) {
             const body = req.body.body
             if (body) {
-                const newNote: Note = await noteModel.create({ body, user })
-                if (newNote) {
-                    console.log(newNote)
+                try {
+                    const newNote: Note = await noteModel.create({ body, user: user._id })
                     return res.status(201).json({ success: true, newNote })
-                } else {
-                    return res.status(500).json({ success: false, error: "Something went wrong"})
+                } catch (error) {
+                    return res.status(500).json({ success: false, error })
                 }
             } else {
                 return res.status(400).json({ success: false, error: "Send needed params" })
@@ -159,14 +132,14 @@ app.post(
 
 // get notes
 app.get(
-    "/notes",
+    "/data",
     authenticateToken,
-    async (req: Request, res: Response): Promise<Response> => {
-        const userId = await tokenModel.findOne({ accessToken: req.headers.authorization })
-        if (userId) {
-            const notes = await noteModel.find({ user: userId })
+    async (req: ExtendedRequest, res: Response): Promise<Response> => {
+        const user = await userModel.findOne({ name: req.user.name })
+        if (user) {
+            const notes = await noteModel.find({ user: user._id })
                 .catch(error => res.status(500).json({ error }))
-            return res.status(201).json({ notes })
+            return res.status(201).json({ username: user.name, notes })
         } else {
             return res.status(401).json({ success: false, error: "No access rights" })
         }
@@ -178,8 +151,8 @@ app.get(
 app.put(
     "/notes/:id",
     authenticateToken,
-    async (req: Request, res: Response): Promise<Response> => {
-        const user = await tokenModel.findOne({ accessToken: req.headers.authorization })
+    async (req: ExtendedRequest, res: Response): Promise<Response> => {
+        const user = await userModel.findOne({ name: req.user.name })
         if (user) {
             const body = req.body.body
             const _id = req.params.id

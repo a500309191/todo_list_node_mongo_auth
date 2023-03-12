@@ -9,7 +9,7 @@ import { useEffect } from "react"
 export const Account = () => {
     const dispatch = useAppDispatch()
     const userState = useAppSelector(state => state.account)
-
+    
     const navigate = useNavigate()
     useEffect(() => {
         if (!userState.isAuthenticated) {
@@ -17,11 +17,13 @@ export const Account = () => {
         }
     }, [userState.isAuthenticated])
 
+
     return (
         <div className="account">
             <Settings />
             <NotesList />
             <AddNote />
+            {userState.error && <div className="error">{userState.error.toUpperCase()}</div>}
         </div>
     )
 }

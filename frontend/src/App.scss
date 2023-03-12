@@ -1,7 +1,7 @@
 $text-color: #323232;
-$gray: #ebedf4;
-$green: #99C794;
-$red: #EC6066;
+$gray: rgb(235, 237, 244);
+$green: rgb(153, 199, 148);
+$red: rgb(236, 96, 102);
 $dark_gray: #AFB0B5;
 
 
@@ -83,6 +83,12 @@ div * {
 }
 
 
+.account {
+  display: grid;
+  grid-template-rows: auto 47vh 1fr;
+  gap: 20px;
+  width: 600px;
+}
 
 
 
@@ -93,29 +99,36 @@ div * {
 
 .settings-logout {
   cursor: pointer;
-}
-
-
-
-.account {
+  background-color: $dark-gray;
+  color: white;
   display: flex;
-  flex-direction: column;
-  gap: 20px;
-  width: 600px;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  width: 70px;
+  height: 20px;
+  // padding: 2px 0px 2px 0px;
 }
+
 
 .notes {
   display: flex;
   flex-direction: column;
+  overflow: visible scroll;
   gap: 6px;
   width: 100%;
+  
 }
 
 .note {
   display: grid;
-  grid-template-columns: 1fr 30px 30px;
+  grid-template-columns: 20px 1fr 30px 30px;
   gap: 10px;
-  // padding: 6px;
+}
+
+.note:hover .note-body {
+  background-color: rgb(213, 215, 228);
+  scale: 1.025;
 }
 
 .note > div {
@@ -125,10 +138,17 @@ div * {
   text-align: center;
 }
 
+.note-index {
+  display: flex;
+  justify-content: flex-end;
+  opacity: 0.5;
+}
+
 .note-body {
   padding-left: 10px;
   background-color: $gray;
   word-break: break-word;
+  transition-duration: 0.5s;
 }
 
 .note-body-edit {
@@ -136,11 +156,12 @@ div * {
   padding-left: 7px;
   box-sizing: border-box;
   // border: 3px solid #ccc;
-  border: 3px solid $gray;
+  border: 3px solid rgb(213, 215, 228);
   -webkit-transition: 0.5s;
   transition: 0.5s;
   outline: none;
   font-size: 16px;
+  scale: 1.025;
 }
 
 .note-body-edit:focus {
@@ -207,15 +228,6 @@ div * {
 
 
 
-
-
-
-
-
-
-
-
-
 .sign-form {
   display: flex;
   flex-direction: column;
@@ -248,4 +260,63 @@ div * {
 }
 .sign-button {
   @include button($h: 30px);
+  color: white;
+  font-weight: bold;
+}
+
+.sign-name,
+.sign-password {
+  font-size: 18px;
+  resize: none;
+  height: 30px;
+  width: 100%;
+  padding: 12px 20px;
+  box-sizing: border-box;
+  border: 1px solid $dark_gray;
+  outline: none;
+  opacity: 0.75;
+}
+
+.sign-name:focus,
+.sign-password:focus {
+  background-color: $gray;
+}
+
+
+
+
+.success,
+.error {
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  height: 100px;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+}
+.success {
+  color: white;
+  animation-name: success;
+}
+@keyframes success {
+  from { background-color: rgba(153, 199, 148, 0.5); }
+  to { background-color: rgba(153, 199, 148, 1); }
+}
+.error {
+  color: white;
+  animation-name: error;
+}
+@keyframes error {
+  from { background-color: rgba(236, 96, 102, 0.3); }
+  to { background-color: rgba(236, 96, 102, 0.7); }
+}
+
+
+.unactive {
+  background-color: $gray;
+  cursor: not-allowed;
 }

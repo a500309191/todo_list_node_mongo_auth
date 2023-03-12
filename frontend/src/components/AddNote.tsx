@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { text } from "stream/consumers";
 import { useAppSelector, useAppDispatch } from "../hooks"
-import { getNotes } from "../store/accountSlice"
+import { getData } from "../store/accountSlice"
 
 
 export const AddNote = () => {
@@ -20,25 +21,34 @@ export const AddNote = () => {
                 },
                 body: req_body
             })
-            .then(res => console.log("ADD NOTE RESPONSE: ", res))
-            .then(() => dispatch(getNotes(token)))
+            .then(() => dispatch(getData(token)))
         } else {
             console.log("there is no token")
         }
     }
 
+    const textarea: HTMLTextAreaElement | null = document.querySelector(".add-note-body")
 
     return (
         <div className="add-note">
             <textarea
-                maxLength={60} 
-                minLength={10} 
                 className="add-note-body"
+                placeholder="Add new note (5 characters minimum and 50 maximum)"
+                maxLength={50} 
+                minLength={5} 
                 onChange={e => setBody(e.target.value)}
             ></textarea>
             <div
-                className="add-note-button"
-                onClick={() => addNote()}
+                className={`${body.length >= 5 ? "add-note-button" : "add-note-button unactive"}`}
+                onClick={() => { 
+                    if (body.length >= 5) {
+                        addNote()
+                        setBody("")
+                        if (textarea !== null) {
+                            textarea.value = ""
+                        }
+                    }
+                }}
             >ADD NOTE</div>
         </div>
     )

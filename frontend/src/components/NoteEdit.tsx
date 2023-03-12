@@ -1,8 +1,9 @@
 import { useState } from "react" 
 import { useAppDispatch, useAppSelector } from "../hooks"
 import { editNote } from "../store/editSlice"
-import { getNotes } from "../store/accountSlice"
+import { getData } from "../store/accountSlice"
 import { Note as NoteType } from "../schemas/schemas"
+import { brotliDecompressSync } from "zlib"
 
 
 export const NoteEdit = ({body, _id: id}: NoteType) => {
@@ -23,8 +24,7 @@ export const NoteEdit = ({body, _id: id}: NoteType) => {
                     "Content-Type": "application/json"
                 },
             })
-            .then(res => console.log("UPDATE NOTE RESPONSE: ", res))
-            .then(() => dispatch(getNotes(token)))
+            .then(() => dispatch(getData(token)))
         } else {
             console.log("there is no token")
         }
@@ -38,8 +38,13 @@ export const NoteEdit = ({body, _id: id}: NoteType) => {
                 onChange={e => setNewBody(e.target.value)}
             />
             <div
-                className="note-save"
-                onClick={ () => updateNote(id) }
+                className={`${newBody.length >= 5 ? "note-save" : "note-save unactive"}`}
+                onClick={ () => {
+                    if (newBody.length >= 5) {
+                        updateNote(id)
+                        dispatch(editNote(0)) 
+                    }
+                }}
             >✔</div>
             <div
                 className="note-cancel"

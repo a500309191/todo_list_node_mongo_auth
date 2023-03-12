@@ -1,9 +1,10 @@
 import { createSlice, PayloadAction, createAsyncThunk, AnyAction } from "@reduxjs/toolkit"
-import type { 
+import type {
+    Error, 
     Login,
     LoginRes,
     Note,
-    Notes,
+    Data,
     AccountState,
     CreateNote,
     User,
@@ -12,7 +13,7 @@ import type {
 
 
 
-export const signIn = createAsyncThunk<LoginRes, Login, {rejectValue: string}>(
+export const signIn = createAsyncThunk<LoginRes, Login, {rejectValue: any}>(
     "note/signIn",
 	async (body, thunkAPI) => {
         const response = await fetch(
@@ -23,46 +24,16 @@ export const signIn = createAsyncThunk<LoginRes, Login, {rejectValue: string}>(
                 body: JSON.stringify(body)
             }
         )
-
-        if (!response.ok) {
-            return thunkAPI.rejectWithValue("something went wrong")
-        }
-
         const data = await response.json()
+
+        if (!response.ok) return thunkAPI.rejectWithValue(data)
+
         return data
 	}
 )
 
 
-export const signOut = createAsyncThunk<void, void, {rejectValue: string}>(
-    "note/signOut",
-	async (_, thunkAPI) => {
-        const token = localStorage.getItem("token")
-        if (token) {
-            const response = await fetch(
-                "http://localhost:8080/user/signout",
-                { 
-                    method: "DELETE",
-                    headers: { "Authorization": `${JSON.parse(token)}` }
-                }
-            )
-            
-            if (!response.ok) {
-                return thunkAPI.rejectWithValue("something went wrong")
-            }
-
-            localStorage.removeItem("token")
-            const data = await response.json()
-            return data
-
-        } else {
-            return thunkAPI.rejectWithValue("something went wrong")
-        }
-	}
-)
-
-
-export const signUp = createAsyncThunk<CreateUser, Login, {rejectValue: string}>(
+export const signUp = createAsyncThunk<CreateUser, Login, {rejectValue: any}>(
     "user/signUp",
 	async (body, thunkAPI) => {
         const response = await fetch(
@@ -73,24 +44,22 @@ export const signUp = createAsyncThunk<CreateUser, Login, {rejectValue: string}>
                 body: JSON.stringify(body)
             }
         )
-
-        if (!response.ok) {
-            return thunkAPI.rejectWithValue("something went wrong")
-        }
-
         const data = await response.json()
-        return data
+
+        if (!response.ok) return thunkAPI.rejectWithValue(data)
+
+        return data    
 	}
 )
 
 
-export const getNotes = createAsyncThunk<Notes, string, {rejectValue: string}>(
-	"user/getNotes",
+export const getData = createAsyncThunk<Data, string, {rejectValue: string}>(
+	"user/getData",
 	async (token, thunkAPI) => {
         
         if (token) {
             const response = await fetch(
-                "http://localhost:8080/notes", 
+                "http://localhost:8080/data", 
                 {
                     method: "GET",
                     headers: {"Authorization": `${JSON.parse(token)}`}
@@ -112,11 +81,11 @@ export const getNotes = createAsyncThunk<Notes, string, {rejectValue: string}>(
 
 
 
-
 const initialState: AccountState = {
     name: "",
     password: "",
     isAuthenticated: false,
+    signUpSuccess: false,
     loading: true,
     error: null,
     notes: [],
@@ -132,7 +101,7 @@ const accountSlice = createSlice({
         setPassword(state, action) {
             state.password = action.payload
         },
-        logOut(state) {
+        signOut(state) {
             localStorage.removeItem("token")
             state.isAuthenticated = false
             state.notes = []
@@ -144,22 +113,29 @@ const accountSlice = createSlice({
         builder
             .addCase(signIn.fulfilled, (state, action) => {
                 localStorage.setItem("token", JSON.stringify(action.payload.accessToken))
-                state.name = action.payload.name
                 state.isAuthenticated = true
-            })
-            .addCase(signOut.fulfilled, (state, action) => {
-                state.isAuthenticated = false
             })
             .addCase(signUp.fulfilled, (state, action) => {
                 state.name = action.payload.name
+                state.signUpSuccess = true
+                state.error = null
             })
-            .addCase(getNotes.fulfilled, (state, action) => {
+            .addCase(getData.fulfilled, (state, action) => {
                 state.notes = action.payload.notes
+                state.name  = action.payload.username
                 state.isAuthenticated = true
+                state.error = ""
+            })
+            .addMatcher(isError, (state, action) => {
+                state.error = action.payload.error
             })
     }
 })
 
 
-export const { setName, setPassword, logOut } = accountSlice.actions
+function isError(action: AnyAction) {
+    return action.type.endsWith("rejected")
+}
+
+export const { setName, setPassword, signOut } = accountSlice.actions
 export default accountSlice.reducer

@@ -1,7 +1,7 @@
 import { useAppDispatch, useAppSelector } from "../hooks"
 import { editNote } from "../store/editSlice"
 import { Note as NoteType } from "../schemas/schemas"
-import { getNotes } from "../store/accountSlice"
+import { getData } from "../store/accountSlice"
 
 
 export const NoteContent = ({body, _id: id}: NoteType) => {
@@ -17,7 +17,7 @@ export const NoteContent = ({body, _id: id}: NoteType) => {
                 headers: { "Authorization": `${JSON.parse(token)}` },
             })
             .then(res => console.log("DELETE NOTE RESPONSE: ", res))
-            .then(() => dispatch(getNotes(token)))
+            .then(() => dispatch(getData(token)))
         } else {
             console.log("there is no token")
         }
