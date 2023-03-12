@@ -1,19 +1,9 @@
-import { createSlice, PayloadAction, createAsyncThunk, AnyAction } from "@reduxjs/toolkit"
-import type {
-    Error, 
-    Login,
-    LoginRes,
-    Note,
-    Data,
-    AccountState,
-    CreateNote,
-    User,
-    CreateUser
-} from "../schemas/schemas"
+import { createSlice, createAsyncThunk, AnyAction } from "@reduxjs/toolkit"
+import type { Error, Login, LoginResponse, Data, AccountState, CreateUser } from "../schemas/schemas"
 
 
 
-export const signIn = createAsyncThunk<LoginRes, Login, {rejectValue: any}>(
+export const signIn = createAsyncThunk<LoginResponse, Login, {rejectValue: Error}>(
     "note/signIn",
 	async (body, thunkAPI) => {
         const response = await fetch(
@@ -33,7 +23,7 @@ export const signIn = createAsyncThunk<LoginRes, Login, {rejectValue: any}>(
 )
 
 
-export const signUp = createAsyncThunk<CreateUser, Login, {rejectValue: any}>(
+export const signUp = createAsyncThunk<CreateUser, Login, {rejectValue: Error}>(
     "user/signUp",
 	async (body, thunkAPI) => {
         const response = await fetch(
@@ -53,28 +43,26 @@ export const signUp = createAsyncThunk<CreateUser, Login, {rejectValue: any}>(
 )
 
 
-export const getData = createAsyncThunk<Data, string, {rejectValue: string}>(
-	"user/getData",
+export const getNotes = createAsyncThunk<Data, string, {rejectValue: Error}>(
+	"user/getNotes",
 	async (token, thunkAPI) => {
         
         if (token) {
             const response = await fetch(
-                "http://localhost:8080/data", 
+                "http://localhost:8080/notes", 
                 {
                     method: "GET",
                     headers: {"Authorization": `${JSON.parse(token)}`}
                 }
             )
-            
-            if (!response.ok) {
-                return thunkAPI.rejectWithValue("something went wrong")
-            }
-            
             const data = await response.json()
+
+            if (!response.ok) return thunkAPI.rejectWithValue(data)
+        
             return data
 
         } else {
-            return thunkAPI.rejectWithValue("something went wrong")
+            return thunkAPI.rejectWithValue({ success: false, error: "There is no access token"})
         }
     }
 )
@@ -120,7 +108,7 @@ const accountSlice = createSlice({
                 state.signUpSuccess = true
                 state.error = null
             })
-            .addCase(getData.fulfilled, (state, action) => {
+            .addCase(getNotes.fulfilled, (state, action) => {
                 state.notes = action.payload.notes
                 state.name  = action.payload.username
                 state.isAuthenticated = true

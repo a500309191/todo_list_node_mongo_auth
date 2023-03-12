@@ -1,12 +1,4 @@
-import {
-  DocumentType,
-  getModelForClass,
-  index,
-  modelOptions,
-  pre,
-  prop,
-  Ref
-} from '@typegoose/typegoose';
+import { getModelForClass, Ref, modelOptions, prop } from '@typegoose/typegoose';
 
 
 @modelOptions({ schemaOptions: { timestamps: true, versionKey: false} })
@@ -17,6 +9,7 @@ export class User {
   @prop({ required: true })
   public password!: string;
 }
+
 
 @modelOptions({ schemaOptions: { timestamps: true, versionKey: false} })
 export class Note {

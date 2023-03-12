@@ -104,5 +104,9 @@
     "./src/app.ts",
     "./src/db/mongo.ts",
     "./src/db/schemas.ts",
+    "./src/routers/notesRouter.ts",
+    "./src/routers/userRouter.ts",
+    "./src/controllers/notesControllers.ts",
+    "./src/controllers/userControllers.ts"
   ]
 }

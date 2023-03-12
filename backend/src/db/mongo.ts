@@ -1,8 +1,7 @@
 import mongoose from 'mongoose';
 
 const { DB_HOST, DB_PORT, DB_NAME } = process.env;
-// const dbUrl = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?authSource=dbWithUserCredentials`
-// const dbUrl = `mongodb://${DB_HOST}:${DB_PORT}/${DB_NAME}`
+// const dbUrl = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?authSource=admin`
 const dbUrl = `mongodb://root:123456@localhost:7017/mongodb?authSource=admin`
 
 

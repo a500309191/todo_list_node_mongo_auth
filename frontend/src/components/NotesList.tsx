@@ -1,5 +1,4 @@
-import { useAppSelector, useAppDispatch } from "../hooks"
-import { useEffect } from "react"
+import { useAppSelector } from "../hooks"
 import { Note } from "./Note"
 import { Note as NoteType } from "../schemas/schemas"
 
@@ -9,7 +8,6 @@ export const NotesList = () => {
 
     return (
         <div className="notes">
-            {/* {notes.map((note: NoteType) => <Note {...note} key={note._id}/>)} */}
             {notes.map((note: NoteType, index: number) => {
                 index += 1
                 const indexedNote: NoteType = {...note, index}

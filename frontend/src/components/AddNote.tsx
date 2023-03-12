@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { text } from "stream/consumers";
-import { useAppSelector, useAppDispatch } from "../hooks"
-import { getData } from "../store/accountSlice"
+import { useAppDispatch } from "../hooks"
+import { getNotes } from "../store/accountSlice"
 
 
 export const AddNote = () => {
@@ -21,7 +20,7 @@ export const AddNote = () => {
                 },
                 body: req_body
             })
-            .then(() => dispatch(getData(token)))
+            .then(() => dispatch(getNotes(token)))
         } else {
             console.log("there is no token")
         }

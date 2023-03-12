@@ -1,9 +1,8 @@
 import { useState } from "react" 
 import { useAppDispatch, useAppSelector } from "../hooks"
 import { editNote } from "../store/editSlice"
-import { getData } from "../store/accountSlice"
+import { getNotes } from "../store/accountSlice"
 import { Note as NoteType } from "../schemas/schemas"
-import { brotliDecompressSync } from "zlib"
 
 
 export const NoteEdit = ({body, _id: id}: NoteType) => {
@@ -24,7 +23,7 @@ export const NoteEdit = ({body, _id: id}: NoteType) => {
                     "Content-Type": "application/json"
                 },
             })
-            .then(() => dispatch(getData(token)))
+            .then(() => dispatch(getNotes(token)))
         } else {
             console.log("there is no token")
         }

@@ -1,7 +1,7 @@
 import { useEffect } from "react"
-import { Routes, Route, redirect, useLocation, Navigate, useNavigate } from "react-router-dom"
+import { Routes, Route, useNavigate } from "react-router-dom"
 import { useAppDispatch, useAppSelector } from './hooks'
-import { getData } from "./store/accountSlice"
+import { getNotes } from "./store/accountSlice"
 import { SignForm } from "./components/SignForm"
 import { Account } from "./components/Account"
 import { PageNotFound } from "./components/PageNotFound"
@@ -17,7 +17,7 @@ export const App = () => {
   useEffect(() => {
     const token = localStorage.getItem("token")
     if (token) {
-      dispatch(getData(token))
+      dispatch(getNotes(token))
       return navigate('/account')
     }
   }, [isAuthenticated])

@@ -320,3 +320,38 @@ div * {
   background-color: $gray;
   cursor: not-allowed;
 }
+
+
+
+.page-not-found {
+display: flex;
+flex-direction: column;
+gap: 50px;
+justify-content: center;
+align-items: center;
+height: 500px;
+width: 600px;
+opacity: 0.6;
+}
+.page-not-found {
+background: linear-gradient(-70deg, #E16ADF, #BCBDC1, #BDE1B0, #BCBDC1, #E1C98D);
+background-position: right;
+background-size: 300% 300%;
+animation-name: page-not-found;
+animation-duration: 2.5s;
+animation-iteration-count: infinite;
+animation-timing-function: ease-in-out;
+animation-direction: alternate;
+}
+@keyframes page-not-found {
+from {background-position: 0% 100%;}
+to {background-position: 100% 0%;}
+}
+
+
+.page-not-found div,
+.page-not-found a {
+  font-weight: bold;
+  font-size: 20px;
+  color: white;
+}

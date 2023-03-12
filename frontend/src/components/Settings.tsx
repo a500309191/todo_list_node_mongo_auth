@@ -1,9 +1,5 @@
 import { useAppDispatch, useAppSelector } from "../hooks"
-import { editNote } from "../store/editSlice"
-import { Note as NoteType } from "../schemas/schemas"
 import { signOut } from "../store/accountSlice"
-import { NoteContent } from "./NoteContent"
-import { NoteEdit } from "./NoteEdit"
 
 
 export const Settings = () => {

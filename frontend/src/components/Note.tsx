@@ -1,10 +1,7 @@
 import { useAppDispatch, useAppSelector } from "../hooks"
-import { editNote } from "../store/editSlice"
 import { Note as NoteType } from "../schemas/schemas"
 import { NoteContent } from "./NoteContent"
 import { NoteEdit } from "./NoteEdit"
-import { normalize } from "path"
-
 
 
 export const Note: React.FC<NoteType> = (note: NoteType) => {

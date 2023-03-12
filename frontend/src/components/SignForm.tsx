@@ -1,4 +1,4 @@
-import { Routes, Route, Link, NavLink, useLocation, redirect } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks"
 import { setName, setPassword } from "../store/accountSlice"
 import { signIn } from "../store/accountSlice"
